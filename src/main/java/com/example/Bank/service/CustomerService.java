@@ -1,0 +1,22 @@
+package com.example.Bank.service;
+
+import com.example.Bank.entity.CustomerEntity;
+import com.example.Bank.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CustomerService {
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    public CustomerEntity createCustomer(CustomerEntity customerEntity) {
+        if (customerEntity.getAccounts() != null) {
+            customerEntity.getAccounts().forEach(account -> account.setCustomer(customerEntity));
+        }
+        return customerRepository.save(customerEntity);
+    }
+
+
+}
