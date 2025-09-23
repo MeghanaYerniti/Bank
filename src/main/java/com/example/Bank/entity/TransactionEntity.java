@@ -1,5 +1,7 @@
 package com.example.Bank.entity;
 
+import com.example.Bank.enums.Status;
+import com.example.Bank.enums.Transcationtype;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

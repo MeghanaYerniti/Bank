@@ -1,4 +1,4 @@
-package com.example.Bank.entity;
+package com.example.Bank.enums;
 
 public enum Transcationtype {
     DEPOSIT,

@@ -2,13 +2,14 @@ package com.example.Bank.service;
 
 import com.example.Bank.entity.CustomerEntity;
 import com.example.Bank.repository.CustomerRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class CustomerService {
 
-    @Autowired
     private CustomerRepository customerRepository;
 
     public CustomerEntity createCustomer(CustomerEntity customerEntity) {
@@ -18,5 +19,9 @@ public class CustomerService {
         return customerRepository.save(customerEntity);
     }
 
+    public CustomerEntity getCustomer(Long id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+    }
 
 }
