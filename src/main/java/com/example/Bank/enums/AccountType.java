@@ -1,5 +1,5 @@
 package com.example.Bank.enums;
-public enum Accounttype{
+public enum AccountType {
     SAVINGS,
     CURRENT
 }

@@ -1,8 +1,10 @@
 package com.example.Bank.entity;
 
 import com.example.Bank.enums.Status;
-import com.example.Bank.enums.Transcationtype;
+import com.example.Bank.enums.TransactionType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,15 +21,17 @@ public class TransactionEntity {
 
     @Id
     @Column(name = "transaction_id")
+    // @GeneratedValue(strategy = GenerationType.UUID)
     private UUID transactionId;
 
     @Column(name = "from_account_id")
-    private long fromAccountId;
+    private Long fromAccountId;
 
     @Column(name = "to_account_id")
-    private long toAccountId;
+    private Long toAccountId;
 
     @Column(name = "amount")
+    @Positive(message = "Amount must be greater than 0")
     private double amount;
 
     @Column(name = "initial_balance")
@@ -38,12 +42,14 @@ public class TransactionEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")
-    private Transcationtype transactionType;
+    @NotNull(message = "Transaction type is required")
+    private TransactionType transactionType;
 
     @Column(name= "timestamp")
     private LocalDateTime timestamp;
 
     @Enumerated(EnumType.STRING)
     @Column(name="status")
+    @NotNull(message = "Status is required")
     private Status status;
 }

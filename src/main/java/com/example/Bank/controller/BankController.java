@@ -2,24 +2,26 @@ package com.example.Bank.controller;
 
 import com.example.Bank.entity.BankAccountEntity;
 import com.example.Bank.entity.CustomerEntity;
+import com.example.Bank.entity.TransactionEntity;
 import com.example.Bank.repository.BankAccountRepository;
 import com.example.Bank.service.BankAccountService;
+import com.example.Bank.service.TransactionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor
 public class BankController {
-    private BankAccountService bankAccountService;
+    private final BankAccountService bankAccountService;
 
-    @PostMapping("/")
-    public String createAccount(@RequestBody BankAccountEntity bankAccountEntity) {
-        bankAccountService.createAccount(bankAccountEntity);
-        return bankAccountEntity.toString();
+    @PostMapping("/insert")
+    public BankAccountEntity createAccount(@Valid @RequestBody BankAccountEntity bankAccountEntity) {
+        return bankAccountService.createAccount(bankAccountEntity);
     }
 
     @GetMapping("/{id}")
@@ -41,7 +43,7 @@ public class BankController {
     @PutMapping("/{id}/withdraw")
     public String withdraw(@PathVariable Long id, @RequestParam double amount) {
         BankAccountEntity updatedAccount = bankAccountService.withdrawAmount(id, amount);
-        return "Deposited " + amount + ". New Balance: " + updatedAccount.getBalance();
+        return "Withdraw " + amount + " New Balance: " + updatedAccount.getBalance();
     }
 
     @DeleteMapping("/{id}")
@@ -54,5 +56,10 @@ public class BankController {
     public List<BankAccountEntity> getAllAccounts() {
         return  bankAccountService.getAllAccounts();
     }
+
+//    @GetMapping("/report/top-balances")
+//    public List<BankAccountEntity> getTopBalances() {
+//        return bankAccountService.getTopBalances(5);
+//    }
 
 }

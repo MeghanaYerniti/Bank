@@ -1,6 +1,6 @@
 package com.example.Bank.enums;
 
-public enum Transcationtype {
+public enum TransactionType {
     DEPOSIT,
     WITHDRAW,
     TRANSFER

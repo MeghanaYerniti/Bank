@@ -1,6 +1,7 @@
 package com.example.Bank.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,15 +21,24 @@ public class CustomerEntity {
     private Long customerId;
 
     @Column(name="name")
+    @NotBlank(message = "Name is required")
+    @Size(min = 5, max = 100, message = "Name must be between 5 and 100 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Name must not contain special characters")
     private String name;
 
     @Column(name="pan")
+    @NotBlank(message = "PAN is required")
+    @Size(min = 8, message = "PAN must be at least 8 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "PAN must not contain special characters")
     private String pan;
 
     @Column(name="email")
+    @Email(message = "Invalid email format")
     private String email;
 
     @Column(name="phone")
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^(\\+91)?[6-9]\\d{9}$", message = "Invalid Indian phone number")
     private String phone;
 
     @ToString.Exclude

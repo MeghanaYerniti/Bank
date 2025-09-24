@@ -1,9 +1,10 @@
 package com.example.Bank.entity;
 
-import com.example.Bank.enums.Accountstatus;
-import com.example.Bank.enums.Accounttype;
+import com.example.Bank.enums.AccountStatus;
+import com.example.Bank.enums.AccountType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -16,8 +17,8 @@ import java.time.LocalDateTime;
 public class BankAccountEntity {
 
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
+    @Min(value = 10000000, message = "Account ID must be at least 8 digits")
     private long accountId;
 
     @ToString.Exclude
@@ -27,14 +28,18 @@ public class BankAccountEntity {
     private CustomerEntity customer;
 
     @Column(name = "account_holder_name")
+    @NotBlank(message = "Account holder name is required")
+    @Size(min = 5, max = 50, message = "Account holder name must be 5 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Account holder name must not contain numbers or special characters")
     private String accountHolderName;
 
     @Column(name = "balance")
+    @PositiveOrZero
     private double balance;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private Accounttype type;
+    private AccountType type;
 
     @Column(name="interest_rate")
     private double interestRate;
@@ -50,7 +55,8 @@ public class BankAccountEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name="account_status")
-    private Accountstatus accountStatus;
+    @NotNull(message = "Account status is required")
+    private AccountStatus accountStatus;
 
 
 }
