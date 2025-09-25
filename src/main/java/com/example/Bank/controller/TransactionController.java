@@ -24,14 +24,4 @@ public class TransactionController {
         return transactionService.getTransaction(id);
     }
 
-    @PutMapping("/transfer")
-    public TransactionEntity transfer(@RequestParam Long fromAccountId, @RequestParam Long toAccountId,
-                                      @RequestParam double amount) {
-        return transactionService.transfer(fromAccountId, toAccountId, amount);
-    }
-
-    @GetMapping("/{id}/transactions")
-    public List<TransactionEntity> getAccountTransactions(@PathVariable Long id) {
-        return transactionService.getTransactionsByAccountId(id);
-    }
 }

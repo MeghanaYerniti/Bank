@@ -3,6 +3,7 @@ package com.example.Bank.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class CustomerEntity {
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Name must not contain special characters")
     private String name;
 
-    @Column(name="pan")
+    @Column(name="pan", unique = true)
     @NotBlank(message = "PAN is required")
     @Size(min = 8, message = "PAN must be at least 8 characters")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "PAN must not contain special characters")

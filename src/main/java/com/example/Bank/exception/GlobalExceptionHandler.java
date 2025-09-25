@@ -123,8 +123,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TransactionSystemException.class)
     public ResponseEntity<Map<String, Object>> handleTransactionSystemException(TransactionSystemException ex, WebRequest request) {
         Throwable cause = ex.getMostSpecificCause();
-        String message = cause != null ? cause.getMessage() : "Could not commit JPA transaction";
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Transaction Error", message, request);
+        String message = cause != null ? cause.getMessage() : "Transaction failed due to system error";
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Transaction Failure", message, request);
     }
 
     @ExceptionHandler(RuntimeException.class)

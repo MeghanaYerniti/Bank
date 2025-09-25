@@ -18,6 +18,7 @@ public class BankAccountEntity {
 
     @Id
     @Column(name = "account_id")
+    @Positive
     @Min(value = 10000000, message = "Account ID must be at least 8 digits")
     private long accountId;
 
@@ -34,7 +35,7 @@ public class BankAccountEntity {
     private String accountHolderName;
 
     @Column(name = "balance")
-    @PositiveOrZero
+    @PositiveOrZero(message = "Balance must be non-negative")
     private double balance;
 
     @Enumerated(EnumType.STRING)
@@ -42,6 +43,8 @@ public class BankAccountEntity {
     private AccountType type;
 
     @Column(name="interest_rate")
+    @PositiveOrZero(message = "Interest rate must be non-negative")
+    @AssertTrue(message = "Interest rate is only applicable for SAVINGS accounts", groups = ValidationGroups.Savings.class)
     private double interestRate;
 
     @Column(name="last_transaction_timestamp")
@@ -58,5 +61,8 @@ public class BankAccountEntity {
     @NotNull(message = "Account status is required")
     private AccountStatus accountStatus;
 
+    public interface ValidationGroups {
+        interface Savings {}
+    }
 
 }

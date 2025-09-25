@@ -5,6 +5,7 @@ import com.example.Bank.entity.CustomerEntity;
 import com.example.Bank.entity.TransactionEntity;
 import com.example.Bank.repository.BankAccountRepository;
 import com.example.Bank.service.BankAccountService;
+import com.example.Bank.service.CustomerService;
 import com.example.Bank.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BankController {
     private final BankAccountService bankAccountService;
+    private final TransactionService transactionService;
 
-    @PostMapping("/insert")
+    @PostMapping("/")
     public BankAccountEntity createAccount(@Valid @RequestBody BankAccountEntity bankAccountEntity) {
         return bankAccountService.createAccount(bankAccountEntity);
     }
@@ -57,9 +59,20 @@ public class BankController {
         return  bankAccountService.getAllAccounts();
     }
 
-//    @GetMapping("/report/top-balances")
-//    public List<BankAccountEntity> getTopBalances() {
-//        return bankAccountService.getTopBalances(5);
-//    }
+    @PutMapping("/transfer")
+    public TransactionEntity transfer(@RequestParam Long fromAccountId, @RequestParam Long toAccountId,
+                                      @RequestParam double amount) {
+        return transactionService.transfer(fromAccountId, toAccountId, amount);
+    }
+
+    @GetMapping("/{id}/transactions")
+    public List<TransactionEntity> getAccountTransactions(@PathVariable Long id) {
+        return transactionService.getTransactionsByAccountId(id);
+    }
+
+    @GetMapping("/report/top-balances")
+    public List<BankAccountEntity> getTopBalances() {
+        return bankAccountService.getTopBalances(5);
+    }
 
 }

@@ -3,6 +3,7 @@ package com.example.Bank.controller;
 import com.example.Bank.entity.BankAccountEntity;
 import com.example.Bank.enums.AccountType;
 import com.example.Bank.service.BankAccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,11 @@ public class BankAccountController2 {
             throw new RuntimeException("Interest calculation is only for SAVINGS accounts");
         }
         return account.getBalance() * (account.getInterestRate() / 100);
+    }
+
+    @PostMapping("/")
+    public BankAccountEntity createAccountV2(@Valid @RequestBody BankAccountEntity bankAccountEntity) {
+        return bankAccountService.createAccountV2(bankAccountEntity);
     }
 
 }

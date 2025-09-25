@@ -42,6 +42,7 @@ public class TransactionService {
             transactionRepository.save(failedTransaction);
             throw new MinimumBalanceException("SAVINGS account must maintain a minimum balance of 1000");
         }
+        // High-value transfer checks
         if (amount > 100000) {
             CustomerEntity customer = fromAccount.getCustomer();
             if (customer.getPan() == null || customer.getPan().isBlank()) {

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -80,13 +81,17 @@ public class BankAccountService {
         transaction.setToAccountId(id);
         transaction.setAmount(amount);
         transaction.setInitialBalance(account.getBalance());
-        transaction.setRemainingBalance(account.getBalance() + amount);
+        double newBalance = account.getBalance() + amount;
+        if (newBalance < 0) {
+            throw new RuntimeException("Deposit cannot result in a negative balance");
+        }
+        transaction.setRemainingBalance(newBalance);
         transaction.setTransactionType(TransactionType.DEPOSIT);
         transaction.setTimestamp(LocalDateTime.now());
         transaction.setStatus(Status.SUCCESS);
         transactionRepository.save(transaction);
 
-        account.setBalance(account.getBalance() + amount);
+        account.setBalance(newBalance);
         account.setLastTransactionTimestamp(LocalDateTime.now());
         account.setUpdatedAt(LocalDateTime.now());
         return bankAccountRepository.save(account);
@@ -105,46 +110,93 @@ public class BankAccountService {
         if (account.getType() == AccountType.CURRENT && (account.getBalance() - amount) < -5000) {
             throw new InsufficientFundsException("CURRENT account cannot go below -5000 overdraft limit");
         }
+        double newBalance = account.getBalance() - amount;
+        if (newBalance < 0 && account.getType() == AccountType.SAVINGS) {
+            throw new RuntimeException("SAVINGS account cannot have a negative balance");
+        }
 
         TransactionEntity transaction = new TransactionEntity();
         transaction.setTransactionId(UUID.randomUUID());
         transaction.setFromAccountId(id);
         transaction.setAmount(amount);
         transaction.setInitialBalance(account.getBalance());
-        transaction.setRemainingBalance(account.getBalance() - amount);
+        transaction.setRemainingBalance(newBalance);
         transaction.setTransactionType(TransactionType.WITHDRAW);
         transaction.setTimestamp(LocalDateTime.now());
         transaction.setStatus(Status.SUCCESS);
         transactionRepository.save(transaction);
 
-        account.setBalance(account.getBalance() - amount);
+        account.setBalance(newBalance);
         account.setLastTransactionTimestamp(LocalDateTime.now());
         account.setUpdatedAt(LocalDateTime.now());
         return bankAccountRepository.save(account);
     }
 
+//    public void deleteAccount(Long id) {
+//        BankAccountEntity account = bankAccountRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Account not found"));
+//        account.setAccountStatus(AccountStatus.CLOSED);
+//        bankAccountRepository.delete(account);
+//    }
+
     public void deleteAccount(Long id) {
         BankAccountEntity account = bankAccountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
-        account.setAccountStatus(AccountStatus.CLOSED);
-        bankAccountRepository.delete(account);
+        if (account.getBalance() == 0) {
+            account.setAccountStatus(AccountStatus.CLOSED);
+            account.setUpdatedAt(LocalDateTime.now());
+            bankAccountRepository.save(account);
+        } else {
+            throw new RuntimeException("Account balance must be 0 to close");
+        }
     }
 
     public List<BankAccountEntity> getAllAccounts() {
         return bankAccountRepository.findAll();
     }
 
-//    public List<BankAccountEntity> getTopBalances(Integer top) {
-//
-//    }
+    public List<BankAccountEntity> getTopBalances(Integer top) {
+        List<BankAccountEntity> allAccounts = bankAccountRepository.findAll();
+        return allAccounts.stream().sorted((a1, a2) -> Double.compare(a2.getBalance(), a1.getBalance()))
+                .limit(top).collect(Collectors.toList());
 
-//
-//     allAccounts.stream().sorted((a1, a2) -> Double.compare(a2.getBalance(), a1.getBalance()))
-//            .limit(topN).collect(Collectors.toList());
+    }
 
     public List<BankAccountEntity> searchAccountType(AccountType accountType) {
         return bankAccountRepository.findAll().stream()
                 .filter(account -> account.getType() == accountType).toList();
+    }
+
+    public BankAccountEntity createAccountV2(BankAccountEntity bankAccountEntity) {
+        Long customerId = bankAccountEntity.getCustomer().getCustomerId();
+        CustomerEntity customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        // Auto-generate accountId (e.g., using a sequence or simple increment logic)
+        Long newAccountId = generateUniqueAccountId();
+        bankAccountEntity.setAccountId(newAccountId);
+
+        // Set default interestRate for SAVINGS if not provided
+        if (bankAccountEntity.getType() == AccountType.SAVINGS && bankAccountEntity.getInterestRate() == 0) {
+            bankAccountEntity.setInterestRate(3.5);
+        } else if (bankAccountEntity.getType() == AccountType.CURRENT && bankAccountEntity.getInterestRate() != 0) {
+            throw new RuntimeException("Interest rate must be 0 for CURRENT accounts");
+        }
+
+        bankAccountEntity.setCustomer(customer);
+        bankAccountEntity.setCreatedAt(LocalDateTime.now());
+        bankAccountEntity.setUpdatedAt(LocalDateTime.now());
+        bankAccountEntity.setAccountStatus(AccountStatus.ACTIVE);
+
+        return bankAccountRepository.save(bankAccountEntity);
+    }
+
+    private Long generateUniqueAccountId() {
+        Long maxId = bankAccountRepository.findAll().stream()
+                .map(BankAccountEntity::getAccountId)
+                .max(Long::compare)
+                .orElse(10000000L);
+        return maxId + 1;
     }
 
 }
