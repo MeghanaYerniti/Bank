@@ -45,8 +45,8 @@ public class BankAccountService {
             }
         }
         bankAccountEntity.setCustomer(customer);
-        bankAccountEntity.setCreatedAt(LocalDateTime.now());
-        bankAccountEntity.setUpdatedAt(LocalDateTime.now());
+//        bankAccountEntity.setCreatedAt(LocalDateTime.now());
+//        bankAccountEntity.setUpdatedAt(LocalDateTime.now());
         bankAccountEntity.setAccountStatus(AccountStatus.ACTIVE);
 
         return bankAccountRepository.save(bankAccountEntity);
@@ -93,7 +93,7 @@ public class BankAccountService {
 
         account.setBalance(newBalance);
         account.setLastTransactionTimestamp(LocalDateTime.now());
-        account.setUpdatedAt(LocalDateTime.now());
+//        account.setUpdatedAt(LocalDateTime.now());
         return bankAccountRepository.save(account);
     }
 
@@ -128,7 +128,7 @@ public class BankAccountService {
 
         account.setBalance(newBalance);
         account.setLastTransactionTimestamp(LocalDateTime.now());
-        account.setUpdatedAt(LocalDateTime.now());
+//        account.setUpdatedAt(LocalDateTime.now());
         return bankAccountRepository.save(account);
     }
 
@@ -178,8 +178,8 @@ public class BankAccountService {
         }
 
         bankAccountEntity.setCustomer(customer);
-        bankAccountEntity.setCreatedAt(LocalDateTime.now());
-        bankAccountEntity.setUpdatedAt(LocalDateTime.now());
+//        bankAccountEntity.setCreatedAt(LocalDateTime.now());
+//        bankAccountEntity.setUpdatedAt(LocalDateTime.now());
         bankAccountEntity.setAccountStatus(AccountStatus.ACTIVE);
 
         return bankAccountRepository.save(bankAccountEntity);

@@ -19,10 +19,10 @@ public class BankAccountEntity {
     @Column(name = "account_id")
     private long accountId;
 
-    @ToString.Exclude
+    @ToString.Exclude // resolve infinite recursion - request - entity built
     @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    @JsonIgnore // to resolve classic "infinite recursion problem" while GetMapping
+    @JoinColumn(name = "customer_id", nullable = false) // specify foreign key
+    @JsonIgnore // to resolve classic "infinite recursion problem" while GetMapping - response
     private CustomerEntity customer;
 
     @Column(name = "account_holder_name")
@@ -31,7 +31,7 @@ public class BankAccountEntity {
     @Column(name = "balance")
     private double balance;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // specify enum type
     @Column(name = "type")
     private AccountType type;
 
@@ -50,4 +50,13 @@ public class BankAccountEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "account_status")
     private AccountStatus accountStatus;
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 }

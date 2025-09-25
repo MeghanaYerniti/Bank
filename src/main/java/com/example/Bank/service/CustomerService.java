@@ -68,7 +68,7 @@ public class CustomerService {
             existingCustomer.setPhone(updatedCustomer.getPhone());
         }
 
-        existingCustomer.setUpdatedAt(LocalDateTime.now());
+        //existingCustomer.setUpdatedAt(LocalDateTime.now());
         return customerRepository.save(existingCustomer);
     }
 

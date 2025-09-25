@@ -61,8 +61,8 @@ public class TransactionService {
         toAccount.setBalance(toAccount.getBalance() + amount);
         fromAccount.setLastTransactionTimestamp(LocalDateTime.now());
         toAccount.setLastTransactionTimestamp(LocalDateTime.now());
-        fromAccount.setUpdatedAt(LocalDateTime.now());
-        toAccount.setUpdatedAt(LocalDateTime.now());
+//        fromAccount.setUpdatedAt(LocalDateTime.now());
+//        toAccount.setUpdatedAt(LocalDateTime.now());
         bankAccountRepository.save(fromAccount);
         bankAccountRepository.save(toAccount);
 
