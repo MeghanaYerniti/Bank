@@ -4,7 +4,6 @@ import com.example.Bank.enums.AccountStatus;
 import com.example.Bank.enums.AccountType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,13 +12,11 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="BankAccount")
+@Table(name = "BankAccount")
 public class BankAccountEntity {
 
     @Id
     @Column(name = "account_id")
-    @Positive
-    @Min(value = 10000000, message = "Account ID must be at least 8 digits")
     private long accountId;
 
     @ToString.Exclude
@@ -29,40 +26,28 @@ public class BankAccountEntity {
     private CustomerEntity customer;
 
     @Column(name = "account_holder_name")
-    @NotBlank(message = "Account holder name is required")
-    @Size(min = 5, max = 50, message = "Account holder name must be 5 and 50 characters")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Account holder name must not contain numbers or special characters")
     private String accountHolderName;
 
     @Column(name = "balance")
-    @PositiveOrZero(message = "Balance must be non-negative")
     private double balance;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private AccountType type;
 
-    @Column(name="interest_rate")
-    @PositiveOrZero(message = "Interest rate must be non-negative")
-    @AssertTrue(message = "Interest rate is only applicable for SAVINGS accounts", groups = ValidationGroups.Savings.class)
+    @Column(name = "interest_rate")
     private double interestRate;
 
-    @Column(name="last_transaction_timestamp")
+    @Column(name = "last_transaction_timestamp")
     private LocalDateTime lastTransactionTimestamp;
 
-    @Column(name="created_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name="update_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="account_status")
-    @NotNull(message = "Account status is required")
+    @Column(name = "account_status")
     private AccountStatus accountStatus;
-
-    public interface ValidationGroups {
-        interface Savings {}
-    }
-
 }

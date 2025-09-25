@@ -1,41 +1,48 @@
 package com.example.Bank.controller;
 
-import com.example.Bank.entity.BankAccountEntity;
+import com.example.Bank.dto.CustomerDTO;
+import com.example.Bank.dto.BankMapper;
 import com.example.Bank.entity.CustomerEntity;
 import com.example.Bank.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-//@RequiredArgsConstructor
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/customers")
+@RequiredArgsConstructor
 public class CustomerController {
 
     private final CustomerService customerService;
 
     @PostMapping("/")
-    public CustomerEntity createCustomer(@Valid @RequestBody CustomerEntity customerEntity) {
-        return customerService.createCustomer(customerEntity);
+    public CustomerDTO createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
+        CustomerEntity entity = BankMapper.INSTANCE.customerDtoToEntity(customerDTO);
+        CustomerEntity saved = customerService.createCustomer(entity);
+        return BankMapper.INSTANCE.customerEntityToDto(saved);
     }
 
     @GetMapping("/{id}")
-    public CustomerEntity getCustomer(@PathVariable Long id) {
-        return customerService.getCustomer(id);
+    public CustomerDTO getCustomer(@PathVariable Long id) {
+        CustomerEntity entity = customerService.getCustomer(id);
+        return BankMapper.INSTANCE.customerEntityToDto(entity);
     }
 
     @PutMapping("/{id}")
-    public CustomerEntity updateCustomer(@PathVariable Long id, @RequestBody CustomerEntity customerEntity) {
-        //CustomerEntity updatedAccount = customerService.updateCustomer(id, customerEntity);
-        return customerService.updateCustomer(id, customerEntity);
+    public CustomerDTO updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerDTO customerDTO) {
+        CustomerEntity entity = BankMapper.INSTANCE.customerDtoToEntity(customerDTO);
+        entity.setCustomerId(id);
+        CustomerEntity updated = customerService.updateCustomer(id, entity);
+        return BankMapper.INSTANCE.customerEntityToDto(updated);
     }
 
     @GetMapping("/")
-    public List<CustomerEntity> getAllCustomers() {
-        return customerService.getAllCustomers();
+    public List<CustomerDTO> getAllCustomers() {
+        return customerService.getAllCustomers().stream()
+                .map(BankMapper.INSTANCE::customerEntityToDto)
+                .collect(Collectors.toList());
     }
 }

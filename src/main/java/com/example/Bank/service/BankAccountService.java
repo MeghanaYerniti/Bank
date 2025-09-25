@@ -132,12 +132,6 @@ public class BankAccountService {
         return bankAccountRepository.save(account);
     }
 
-//    public void deleteAccount(Long id) {
-//        BankAccountEntity account = bankAccountRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Account not found"));
-//        account.setAccountStatus(AccountStatus.CLOSED);
-//        bankAccountRepository.delete(account);
-//    }
 
     public void deleteAccount(Long id) {
         BankAccountEntity account = bankAccountRepository.findById(id)

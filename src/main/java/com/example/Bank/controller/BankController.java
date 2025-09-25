@@ -1,11 +1,11 @@
 package com.example.Bank.controller;
 
+import com.example.Bank.dto.BankAccountDTO;
+import com.example.Bank.dto.TransactionDTO;
+import com.example.Bank.dto.BankMapper;
 import com.example.Bank.entity.BankAccountEntity;
-import com.example.Bank.entity.CustomerEntity;
 import com.example.Bank.entity.TransactionEntity;
-import com.example.Bank.repository.BankAccountRepository;
 import com.example.Bank.service.BankAccountService;
-import com.example.Bank.service.CustomerService;
 import com.example.Bank.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +22,16 @@ public class BankController {
     private final TransactionService transactionService;
 
     @PostMapping("/")
-    public BankAccountEntity createAccount(@Valid @RequestBody BankAccountEntity bankAccountEntity) {
-        return bankAccountService.createAccount(bankAccountEntity);
+    public BankAccountDTO createAccount(@Valid @RequestBody BankAccountDTO bankAccountDTO) {
+        BankAccountEntity entity = BankMapper.INSTANCE.bankAccountDtoToEntity(bankAccountDTO);
+        BankAccountEntity saved = bankAccountService.createAccount(entity);
+        return BankMapper.INSTANCE.bankAccountEntityToDto(saved);
     }
 
     @GetMapping("/{id}")
-    public BankAccountEntity getAccount(@PathVariable Long id) {
-        return bankAccountService.getAccount(id);
+    public BankAccountDTO getAccount(@PathVariable Long id) {
+        BankAccountEntity entity = bankAccountService.getAccount(id);
+        return BankMapper.INSTANCE.bankAccountEntityToDto(entity);
     }
 
     @GetMapping("/{id}/balance")
@@ -51,28 +54,34 @@ public class BankController {
     @DeleteMapping("/{id}")
     public String deleteAccount(@PathVariable Long id) {
         bankAccountService.deleteAccount(id);
-        return  "Deleted account " + id;
+        return "Deleted account " + id;
     }
 
     @GetMapping("/allaccounts")
-    public List<BankAccountEntity> getAllAccounts() {
-        return  bankAccountService.getAllAccounts();
+    public List<BankAccountDTO> getAllAccounts() {
+        return bankAccountService.getAllAccounts().stream()
+                .map(BankMapper.INSTANCE::bankAccountEntityToDto)
+                .collect(Collectors.toList());
     }
 
     @PutMapping("/transfer")
-    public TransactionEntity transfer(@RequestParam Long fromAccountId, @RequestParam Long toAccountId,
-                                      @RequestParam double amount) {
-        return transactionService.transfer(fromAccountId, toAccountId, amount);
+    public TransactionDTO transfer(@RequestParam Long fromAccountId, @RequestParam Long toAccountId,
+                                   @RequestParam double amount) {
+        TransactionEntity entity = transactionService.transfer(fromAccountId, toAccountId, amount);
+        return BankMapper.INSTANCE.transactionEntityToDto(entity);
     }
 
     @GetMapping("/{id}/transactions")
-    public List<TransactionEntity> getAccountTransactions(@PathVariable Long id) {
-        return transactionService.getTransactionsByAccountId(id);
+    public List<TransactionDTO> getAccountTransactions(@PathVariable Long id) {
+        return transactionService.getTransactionsByAccountId(id).stream()
+                .map(BankMapper.INSTANCE::transactionEntityToDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/report/top-balances")
-    public List<BankAccountEntity> getTopBalances() {
-        return bankAccountService.getTopBalances(5);
+    public List<BankAccountDTO> getTopBalances() {
+        return bankAccountService.getTopBalances(5).stream()
+                .map(BankMapper.INSTANCE::bankAccountEntityToDto)
+                .collect(Collectors.toList());
     }
-
 }

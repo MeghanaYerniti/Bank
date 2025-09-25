@@ -1,13 +1,16 @@
 package com.example.Bank.controller;
 
-import com.example.Bank.entity.BankAccountEntity;
+import com.example.Bank.dto.BankAccountDTO;
 import com.example.Bank.enums.AccountType;
+import com.example.Bank.dto.BankMapper;
+import com.example.Bank.entity.BankAccountEntity;
 import com.example.Bank.service.BankAccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v2/accounts")
@@ -17,11 +20,13 @@ public class BankAccountController2 {
     private final BankAccountService bankAccountService;
 
     @GetMapping("/search")
-    public List<BankAccountEntity> searchAccountType(@RequestParam AccountType accountType) {
-        return bankAccountService.searchAccountType(accountType);
+    public List<BankAccountDTO> searchAccountType(@RequestParam AccountType accountType) {
+        return bankAccountService.searchAccountType(accountType).stream()
+                .map(BankMapper.INSTANCE::bankAccountEntityToDto)
+                .collect(Collectors.toList());
     }
 
-    @GetMapping("{id}/intrest")
+    @GetMapping("{id}/interest")
     public double getInterest(@PathVariable Long id) {
         BankAccountEntity account = bankAccountService.getAccount(id);
         if (account.getType() != AccountType.SAVINGS) {
@@ -31,8 +36,9 @@ public class BankAccountController2 {
     }
 
     @PostMapping("/")
-    public BankAccountEntity createAccountV2(@Valid @RequestBody BankAccountEntity bankAccountEntity) {
-        return bankAccountService.createAccountV2(bankAccountEntity);
+    public BankAccountDTO createAccountV2(@Valid @RequestBody BankAccountDTO bankAccountDTO) {
+        BankAccountEntity entity = BankMapper.INSTANCE.bankAccountDtoToEntity(bankAccountDTO);
+        BankAccountEntity saved = bankAccountService.createAccountV2(entity);
+        return BankMapper.INSTANCE.bankAccountEntityToDto(saved);
     }
-
 }
